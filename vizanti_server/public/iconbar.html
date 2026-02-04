@@ -1,11 +1,12 @@
 <div id="icon_bar">
+	<div id="icon_bar_toggle" class="icon" title="Toggle widgets" aria-label="Toggle widgets">≡</div>
 
 	<div id="icon_container" onmousedown="iconContainerScrollHandler(event)">
 		<!-- Icon templates get rendered in here  -->
 	</div>
 
-	<div id="icon_bar_handle" ontouchstart="iconBarHandler(event)" onmousedown="iconBarHandler(event)"></div>
-	
+	<div id="hidden_icon_container" aria-hidden="true"></div>
+
 </div>
 
 <script>
@@ -15,8 +16,8 @@
 		event.preventDefault();
 
 		const container = document.getElementById('icon_container');
-		container.setAttribute("mouse_start", event.clientX)
-		container.setAttribute("scroll_start", document.getElementById('icon_bar').scrollLeft)
+		container.setAttribute("mouse_start", event.clientY)
+		container.setAttribute("scroll_start", document.getElementById('icon_bar').scrollTop)
 
 		document.addEventListener('mousemove', iconContainerMouseMove);
 		document.addEventListener('mouseup', iconContainerMouseUp);
@@ -26,7 +27,7 @@
 		const container = document.getElementById('icon_container');
 		const scroll_start = parseFloat(container.getAttribute("scroll_start"));
 		const mouse_start = parseFloat(container.getAttribute("mouse_start"));
-		document.getElementById('icon_bar').scrollLeft = scroll_start + (mouse_start - event.clientX);
+		document.getElementById('icon_bar').scrollTop = scroll_start + (mouse_start - event.clientY);
 	}
 
 	function iconContainerMouseUp() {
@@ -34,89 +35,62 @@
 		document.removeEventListener('mouseup', iconContainerMouseUp);
 	}
 
-	//dra expanding the icon bar downwards
-	function iconBarHandler(event) {
-		event.preventDefault();
-
-		document.addEventListener('mousemove', iconBarMouseMove);
-		document.addEventListener('touchmove', iconBarMouseMove);
-
-		document.addEventListener('mouseup', iconBarMouseUp);
-		document.addEventListener('touchend', iconBarMouseUp);
-	}
-
-	function calculateWidth() {
+	function calculateHeight() {
 		const iconBar = document.getElementById('icon_bar');
 		const iconContainer = document.getElementById('icon_container');
-		const iconBarHandle = document.getElementById('icon_bar_handle');
 
-		//default height
-		if(iconBar.style.height == ""){
-			iconBar.style.height = "75px";
-			iconContainer.style.height = "75px";
+		if(iconBar.style.width == ""){
+			iconBar.style.width = "75px";
 		}
 
-		const numRows = Math.ceil(parseInt(iconBar.style.height) / 60)-1;
+		const barWidth = parseInt(iconBar.style.width);
+		const numColumns = Math.max(1, Math.floor((barWidth - 10) / 60));
 		const totalIcons = iconContainer.children.length;
-		let requiredWidth = Math.ceil(totalIcons / numRows) * 60 + 10; // icon width;
+		let requiredHeight = Math.ceil(totalIcons / numColumns) * 60 + 10;
 
-		if (requiredWidth < window.innerWidth)
-			requiredWidth = window.innerWidth;
+		if (requiredHeight < window.innerHeight)
+			requiredHeight = window.innerHeight;
 
-		iconContainer.style.width = requiredWidth + 'px';
-		iconBarHandle.style.width = requiredWidth + 'px';
+		iconContainer.style.height = requiredHeight + 'px';
 
-		window.dispatchEvent(new Event("iconbar_height_change"));		
+		window.dispatchEvent(new Event("iconbar_height_change"));
 	}
 
-	function iconBarMouseMove(event) {
-		const iconBar = document.getElementById('icon_bar');
-		const iconContainer = document.getElementById('icon_container');
-		let newpos = event.touches && event.touches[0] ? event.touches[0].clientY : event.clientY;
-		newpos = parseInt(newpos / 60) * 60;
-
-		if (newpos < 60) newpos = 60;
-		else if (newpos > 360) newpos = 360;
-
-		iconBar.style.height = (newpos + 15) + 'px';
-		iconContainer.style.height = iconBar.style.height;
-
-		calculateWidth();
-	}
-
-	function iconBarMouseUp() {
-		document.removeEventListener('mousemove', iconBarMouseMove);
-		document.removeEventListener('touchmove', iconBarMouseMove);
-
-		document.removeEventListener('mouseup', iconBarMouseUp);
-		document.removeEventListener('touchend', iconBarMouseUp);
-
-		saveHeight();
-	}
-
-	window.addEventListener('icons_changed', calculateWidth);
-	window.addEventListener('resize', calculateWidth);
+	window.addEventListener('icons_changed', calculateHeight);
+	window.addEventListener('resize', calculateHeight);
 
 	//allow scrolling without holding down shift
 	document.getElementById('icon_bar').addEventListener("wheel", function (e) {
-		document.getElementById('icon_bar').scrollLeft += e.deltaY*0.5;
+		document.getElementById('icon_bar').scrollTop += e.deltaY*0.5;
 	});
 
-	function saveHeight() {
-		const height = document.getElementById('icon_bar').style.height;
-		if (height) {
-			localStorage.setItem('iconBarHeight', height);
+	function toggleCollapsed() {
+		const iconBar = document.getElementById('icon_bar');
+		if (iconBar.classList.contains('collapsed')) {
+			iconBar.classList.remove('collapsed');
+			localStorage.setItem('iconBarCollapsed', 'false');
+		} else {
+			iconBar.classList.add('collapsed');
+			localStorage.setItem('iconBarCollapsed', 'true');
 		}
+		calculateHeight();
 	}
 
-	//restore height on load, this is display-specific so it's not part of the main settings
+	//restore collapsed on load, this is display-specific so it's not part of the main settings
 	document.addEventListener('DOMContentLoaded', ()=>{
-		const savedHeight = localStorage.getItem('iconBarHeight');
-		if (savedHeight) {			
-			document.getElementById('icon_bar').style.height = savedHeight;
-			document.getElementById('icon_container').style.height = savedHeight;
-			calculateWidth();
+		const iconBar = document.getElementById('icon_bar');
+		const savedCollapsed = localStorage.getItem('iconBarCollapsed');
+
+		if (savedCollapsed === 'true') {
+			iconBar.classList.add('collapsed');
 		}
+		calculateHeight();
+	});
+
+	document.getElementById('icon_bar_toggle').addEventListener('click', (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		toggleCollapsed();
 	});
 
 </script>

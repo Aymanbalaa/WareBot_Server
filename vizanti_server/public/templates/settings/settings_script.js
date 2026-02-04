@@ -17,29 +17,49 @@ let status = new Status(
 const icon = document.getElementById("{uniqueID}_icon").getElementsByTagName('img')[0];
 const selectionbox = document.getElementById("{uniqueID}_fixedframe");
 const colourpicker = document.getElementById("{uniqueID}_colorpicker");
+const developerModeCheckbox = document.getElementById("{uniqueID}_developer_mode");
+const modeLabel = document.getElementById("{uniqueID}_mode_label");
 
 colourpicker.addEventListener("input", (event) =>{
 	document.body.style.backgroundColor = colourpicker.value;
 	saveSettings();
 });
 
+developerModeCheckbox.addEventListener("change", (event) =>{
+	updateModeLabel();
+	saveSettings();
+	window.location.reload();
+});
+
+function updateModeLabel(){
+	if(developerModeCheckbox.checked){
+		modeLabel.textContent = "Developer";
+	}else{
+		modeLabel.textContent = "Operator";
+	}
+}
+
 // Settings
 if (settings.hasOwnProperty('{uniqueID}')) {
 	const loadedData = settings['{uniqueID}'];
 	tf.setFixedFrame(loadedData.fixed_frame);
 	document.body.style.backgroundColor = loadedData.background_color;
+	developerModeCheckbox.checked = loadedData.developer_mode ?? false;
+	updateModeLabel();
 }else{
 	if(tf.fixed_frame == ""){
-		tf.setFixedFrame("odom");
-		status.setWarn("No frame selected, defaulting to odom");
+		tf.setFixedFrame("map");
+		status.setWarn("No frame selected, defaulting to map");
 	}
+	updateModeLabel();
 	saveSettings();
 }
 
 function saveSettings() {
 	settings['{uniqueID}'] = {
 		fixed_frame: tf.fixed_frame,
-		background_color: colourpicker.value
+		background_color: colourpicker.value,
+		developer_mode: developerModeCheckbox.checked
 	};
 	settings.save();
 }

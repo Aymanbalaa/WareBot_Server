@@ -139,10 +139,12 @@ object {
 }
 
 .icon {
-	display: inline-block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	position: relative;
-	width: 50px;
-	height: 50px;
+	width: 65px;
+	height: 65px;
 	margin: 5px;
 	border-radius: 15px;
 
@@ -154,6 +156,16 @@ object {
     -webkit-box-sizing: border-box;
 
 	transition: linear  0.2s;
+	flex-shrink: 0;
+}
+
+.icon img,
+.icon object,
+.icon svg {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	padding: 5px;
 }
 
 .icon-warn {
@@ -193,22 +205,78 @@ object {
 	height: 100%;
 	justify-content: start;
 	align-content: start;
-	width: 200vw;
-}
-  
-#icon_bar {
-	background-color: rgba(0, 0, 0, 0.7);
-	height: 70px;
 	width: 100%;
+	transition: max-height 0.2s ease, opacity 0.2s ease;
+	max-height: 100vh;
+	gap: 0;
+}
+
+.icon-label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+}
+
+.icon-label .icon {
+	margin: 5px;
+}
+
+.icon-label-text {
+	font-size: 10px;
+	text-align: center;
+	color: #cfcfcf;
+	white-space: nowrap;
 	overflow: hidden;
-	overflow-x: scroll;
-	overflow-y: hidden;
+	text-overflow: ellipsis;
+	max-width: 65px;
+	line-height: 1.2;
+}
+
+#hidden_icon_container {
+	display: none;
+}
+
+#icon_bar {
+	background-color: transparent;
+	height: 100vh;
+	width: 75px;
+	overflow: hidden;
+	overflow-y: scroll;
+	overflow-x: hidden;
 	scrollbar-width: none;
 	display: block;
-	position: relative;
-	transition: height 0.1s;
+	position: fixed;
+	top: 0;
+	right: 0;
+	transition: width 0.1s;
 	z-index: 10;
 	-ms-overflow-style: none;
+}
+
+#icon_bar_toggle {
+	position: sticky;
+	top: 10px;
+	margin: 5px;
+	z-index: 11;
+	width: 65px;
+	height: 65px;
+	line-height: 65px;
+	text-align: center;
+	font-size: 20px;
+	user-select: none;
+	background-color: rgba(124, 124, 124, 0.3);
+	border-radius: 15px;
+	border: none;
+	cursor: pointer;
+	transition: linear 0.2s;
+	flex-shrink: 0;
+}
+
+#icon_bar_toggle:hover {
+	background-color: rgba(185, 185, 185, 0.3);
+	transform: scale(1.05);
 }
 
 #icon_bar::-webkit-scrollbar {
@@ -223,29 +291,61 @@ object {
 	display: none;
 }
 
-#icon_bar_handle {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100vw;
-	height: 12px;
-	cursor: grab;
+
+#icon_bar.collapsed {
+	width: 16px;
 }
 
-#icon_bar_handle::before {
-	content: '';
-	display: block;
-	position: absolute;
-	background-color:#444444;
-	height: 7px;
-	width: 100%;
-	bottom: 0;
-	left: 0;
+#icon_bar.collapsed #icon_container {
+	opacity: 0;
+	pointer-events: none;
+	max-height: 0;
+	overflow: hidden;
 }
 
-#icon_bar_handle:hover::before {
-	background-color: #333333;
+.mode_toggle {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	width: auto;
+	height: auto;
+	padding: 12px 15px;
+	border-radius: 8px;
+	background-color: rgba(124, 124, 124, 0.4);
+	color: #cfcfcf;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	font-size: 24px;
+	z-index: 15;
+	transition: background-color 0.2s, transform 0.2s;
+	border: 2px solid rgba(185, 185, 185, 0.3);
+	user-select: none;
 }
+
+.mode_toggle_icon {
+	font-size: 24px;
+}
+
+.mode_toggle_text {
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	letter-spacing: 0.5px;
+}
+
+.mode_toggle:hover {
+	background-color: rgba(185, 185, 185, 0.5);
+	transform: scale(1.05);
+}
+
+.mode_toggle:active {
+	transform: scale(0.95);
+}
+
 
 /* Modal windows */
 
@@ -620,6 +720,15 @@ canvas {
 	height: 100%;
 	overflow: hidden;
 	z-index: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#view_container > canvas {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .compressedimage {

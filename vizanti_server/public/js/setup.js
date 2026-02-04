@@ -86,3 +86,33 @@ document.getElementById("modal_container").addEventListener("contextmenu", (even
 document.getElementById("icon_bar").addEventListener("contextmenu", (event) => {
 	event.preventDefault();
 });
+
+// Mode toggle
+document.getElementById("mode_toggle").addEventListener("click", async (event) => {
+	event.preventDefault();
+	event.stopPropagation();
+	
+	let persistentModule = await import(`${base_url}/js/modules/persistent.js`);
+	let settings = persistentModule.settings;
+	
+	if (!settings.settings_default) {
+		settings.settings_default = {};
+	}
+	
+	settings.settings_default.developer_mode = !settings.settings_default.developer_mode;
+	settings.save();
+	window.location.reload();
+});
+
+// Update mode label on load
+document.addEventListener('DOMContentLoaded', async () => {
+	let persistentModule = await import(`${base_url}/js/modules/persistent.js`);
+	let settings = persistentModule.settings;
+	
+	const modeText = document.getElementById("mode_toggle_text");
+	if (settings.settings_default && settings.settings_default.developer_mode) {
+		modeText.textContent = "Developer";
+	} else {
+		modeText.textContent = "Operator";
+	}
+});

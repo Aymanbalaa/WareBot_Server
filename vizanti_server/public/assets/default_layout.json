@@ -1,20 +1,54 @@
 {
+  "show_add_button": false,
+  "developer_widgets": [
+    {
+      "type": "teleop",
+      "id": "teleop_default"
+    },
+    {
+      "type": "map",
+      "id": "costmap_local_default",
+      "container_id": "hidden_icon_container"
+    },
+    {
+      "type": "map",
+      "id": "costmap_global_default",
+      "container_id": "hidden_icon_container"
+    }
+  ],
   "navbar": [
     {
-      "type": "settings",
-      "id": "settings_default"
+      "type": "simplegoal",
+      "id": "simplegoal_default"
     },
     {
-      "type": "rosbridge",
-      "id": "rosbridge_default"
+      "type": "initialpose",
+      "id": "initialpose_default"
     },
     {
-      "type": "grid",
-      "id": "grid_default"
+      "type": "map",
+      "id": "map_default",
+      "container_id": "hidden_icon_container"
     },
     {
       "type": "tf",
-      "id": "tf_default"
+      "id": "tf_default",
+      "container_id": "hidden_icon_container"
+    },
+    {
+      "type": "path",
+      "id": "path_default",
+      "container_id": "hidden_icon_container"
+    },
+    {
+      "type": "scan",
+      "id": "scan_default",
+      "container_id": "hidden_icon_container"
+    },
+    {
+      "type": "grid",
+      "id": "grid_default",
+      "container_id": "hidden_icon_container"
     }
   ],
   "view": {
@@ -23,5 +57,45 @@
       "y": 0
     },
     "scale": 50
+  },
+  "map_default": {
+    "topic": "/map",
+    "opacity": 0.7,
+    "colour_scheme": 0,
+    "throttle": 1000,
+    "use_timestamp": false
+  },
+  "tf_default": {
+    "show_names": true,
+    "show_axes": true,
+    "show_lines": true,
+    "scale": 1.0,
+    "frame_visibility": {}
+  },
+  "path_default": {
+    "topic": "/plan",
+    "color": "#54db67",
+    "throttle": 100
+  },
+  "scan_default": {
+    "topic": "/scan",
+    "opacity": 1.0,
+    "thickness": 0.02,
+    "color": "#ff0000",
+    "throttle": 2000
+  },
+  "costmap_local_default": {
+    "topic": "/costmap_node_ros1/costmap/costmap",
+    "opacity": 0.5,
+    "colour_scheme": 1,
+    "throttle": 1000,
+    "use_timestamp": false
+  },
+  "costmap_global_default": {
+    "topic": "/global_costmap/costmap",
+    "opacity": 0.4,
+    "colour_scheme": 1,
+    "throttle": 1000,
+    "use_timestamp": false
   }
 }

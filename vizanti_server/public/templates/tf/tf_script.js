@@ -40,6 +40,8 @@ let prev_transforms = new Set();
 let grouped_frames = [];
 let frame_visibility = {};
 
+const allowed_frames = ['base_footprint', 'base_link'];
+
 // Settings
 
 if (settings.hasOwnProperty('{uniqueID}')) {
@@ -268,11 +270,11 @@ function updateVisibility(){
 		const parent = tf.transforms[key].parent;
 
 		if(!frame_visibility.hasOwnProperty(child)){
-			frame_visibility[child] = true;
+			frame_visibility[child] = allowed_frames.includes(child);
 		}
 
 		if(!frame_visibility.hasOwnProperty(parent)){
-			frame_visibility[parent] = true;
+			frame_visibility[parent] = allowed_frames.includes(parent);
 		}
 
 		if (frame_visibility[child]) {

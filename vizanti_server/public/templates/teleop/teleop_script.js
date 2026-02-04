@@ -18,7 +18,7 @@ let status = new Status(
 );
 
 let typedict = {};
-let joy_offset_x = "50%";
+let joy_offset_x = "85%";
 let joy_offset_y = "85%";
 let cmdVelPublisher = undefined;
 

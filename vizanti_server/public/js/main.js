@@ -54,9 +54,32 @@ function initializeNav() {
 	};
 
 	const add = element_templates["add"];
-	modal_container.appendChild(createElement(add.modal, "addbutton"));
-	icon_container.appendChild(createElement(add.icon, "addbutton"));
-	scripts.push(createScript(add.script, "addbutton"));
+	const isDeveloperMode = settings.settings_default && settings.settings_default.developer_mode;
+	if (isDeveloperMode) {
+		modal_container.appendChild(createElement(add.modal, "addbutton"));
+		icon_container.appendChild(createElement(add.icon, "addbutton"));
+		scripts.push(createScript(add.script, "addbutton"));
+		
+		if (settings.developer_widgets) {
+			settings.developer_widgets.forEach((widget) => {
+				const template = element_templates[widget.type];
+				const eid = widget.id;
+				const container = widget.container_id;
+				
+				const container_element = document.getElementById(container || "icon_container");
+				container_element.appendChild(createElement(template.icon, eid));
+				
+				if (template.hasOwnProperty("modal"))
+					modal_container.appendChild(createElement(template.modal, eid));
+				
+				if (template.hasOwnProperty("view"))
+					view_container.appendChild(createElement(template.view, eid));
+				
+				if(template.hasOwnProperty("script"))
+					scripts.push(createScript(template.script, eid));
+			});
+		}
+	}
 
 	scripts.forEach(element => {
 		script_container.appendChild(element);
