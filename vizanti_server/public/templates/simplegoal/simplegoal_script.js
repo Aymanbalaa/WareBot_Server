@@ -4,6 +4,8 @@ let rosbridgeModule = await import(`${base_url}/js/modules/rosbridge.js`);
 let persistentModule = await import(`${base_url}/js/modules/persistent.js`);
 let StatusModule = await import(`${base_url}/js/modules/status.js`);
 
+console.log("Simplegoal script loaded");
+
 let view = viewModule.view;
 let tf = tfModule.tf;
 let rosbridge = rosbridgeModule.rosbridge;
@@ -47,9 +49,16 @@ function sendMessage(pos, delta){
 
 	let map_pos = view.screenToFixed(pos);
 
-	const currentTime = new Date();
-	const currentTimeSecs = Math.floor(currentTime.getTime() / 1000);
-	const currentTimeNsecs = (currentTime.getTime() % 1000) * 1e6;
+	// Validate position values
+	if(isNaN(map_pos.x) || isNaN(map_pos.y) || isNaN(yaw) || isNaN(quat.x) || isNaN(quat.y) || isNaN(quat.z) || isNaN(quat.w)){
+		status.setError("Could not send message, invalid values detected.");
+		console.error("Invalid values - map_pos:", map_pos, "quat:", quat, "yaw:", yaw);
+		return;
+	}
+
+	const currentTimeMs = new Date().getTime();
+	const currentTimeSecs = Math.floor(currentTimeMs / 1000);
+	const currentTimeNsecs = (currentTimeMs % 1000) * 1000000;
 
 	const publisher = new ROSLIB.Topic({
 		ros: rosbridge.ros,
@@ -63,22 +72,24 @@ function sendMessage(pos, delta){
 				sec: currentTimeSecs,
 				nanosec: currentTimeNsecs
 			},
-			frame_id: tf.fixed_frame
+			frame_id: tf.fixed_frame || "map"
 		},
 		pose: {
 			position: {
-				x: map_pos.x,
-				y: map_pos.y,
+				x: parseFloat(map_pos.x),
+				y: parseFloat(map_pos.y),
 				z: 0.0
 			},
 			orientation: {
-				x: quat.x,
-				y: quat.y,
-				z: quat.z,
-				w: quat.w
+				x: parseFloat(quat.x),
+				y: parseFloat(quat.y),
+				z: parseFloat(quat.z),
+				w: parseFloat(quat.w)
 			}
 		}
 	});	
+	
+	console.log("Publishing nav goal:", poseMessage);
 	publisher.publish(poseMessage);
 	status.setOK();
 }
@@ -133,6 +144,7 @@ function drag(event){
 }
 
 function endDrag(event){
+	console.log("endDrag called with start_point:", start_point, "delta:", delta);
 	sendMessage(start_point, delta);
 
 	start_point = undefined;
@@ -252,5 +264,5 @@ function cancelLongPress(event) {
 }
 
 resizeScreen();
-
-console.log("Simple Goal Widget Loaded {uniqueID}")
+addListeners();
+console.log("Simplegoal Widget Loaded - {uniqueID}, topic:", topic);

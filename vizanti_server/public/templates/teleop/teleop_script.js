@@ -406,9 +406,9 @@ function connect(){
 function publishTwist(x, y, z, wx, wy, wz) {
 
 	function getStamp(){
-		const currentTime = new Date();
-		const currentTimeSecs = Math.floor(currentTime.getTime() / 1000);
-		const currentTimeNsecs = (currentTime.getTime() % 1000) * 1e6;
+		const currentTimeMs = new Date().getTime();
+		const currentTimeSecs = Math.floor(currentTimeMs / 1000);
+		const currentTimeNsecs = (currentTimeMs % 1000) * 1000000;
 
 		return {
 			sec: currentTimeSecs,
