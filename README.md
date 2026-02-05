@@ -6,6 +6,8 @@ A mission planner and visualizer for controlling outdoor ROS robots with a web-b
 
 WareBot Server (based on Vizanti) is a ROS 2 package that provides a powerful web-based mission planner and visualizer for outdoor robotics applications. It offers an intuitive browser-based interface for monitoring and controlling ROS robots, making it easy to visualize sensor data, plan missions, and interact with robot systems.
 
+**Note**: The ROS 2 package name is `vizanti_server`, while the repository is named `WareBot_Server`. All ROS 2 commands will reference the package name `vizanti_server`.
+
 ## Features
 
 - 🌐 **Web-Based Interface**: Access your robot control and visualization through any modern web browser
@@ -134,7 +136,7 @@ WareBot_Server/
 
 The web interface is built with:
 - Vanilla JavaScript (ES6 modules)
-- Jinja2 templating
+- Jinja2 templating (server-side with Flask)
 - Canvas-based rendering for visualizations
 - Modular widget system for extensibility
 
