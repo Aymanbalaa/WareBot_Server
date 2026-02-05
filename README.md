@@ -1,10 +1,12 @@
 # WareBot Server
 
+*This project is based on Vizanti.*
+
 A mission planner and visualizer for controlling outdoor ROS robots with a web-based interface.
 
 ## Overview
 
-WareBot Server (based on Vizanti) is a ROS 2 package that provides a powerful web-based mission planner and visualizer for outdoor robotics applications. It offers an intuitive browser-based interface for monitoring and controlling ROS robots, making it easy to visualize sensor data, plan missions, and interact with robot systems.
+WareBot Server is a ROS 2 package that provides a powerful web-based mission planner and visualizer for outdoor robotics applications. It offers an intuitive browser-based interface for monitoring and controlling ROS robots, making it easy to visualize sensor data, plan missions, and interact with robot systems.
 
 **Note**: The ROS 2 package name is `vizanti_server`, while the repository is named `WareBot_Server`. All ROS 2 commands will reference the package name `vizanti_server`.
 
@@ -165,16 +167,6 @@ Contributions are welcome! Please see [Contributing.md](Contributing.md) for det
 ## License
 
 This project is licensed under the BSD License. See the package.xml for details.
-
-## Maintainers
-
-- **Original Vizanti Project**:
-  - Vid Rijavec (vid.rijavec@gmail.com)
-  - Alastair Bradford (albradford2468@gmail.com)
-
-## Acknowledgments
-
-This project is based on [Vizanti](https://github.com/MoffKalast/vizanti), a powerful ROS 2 visualization and mission planning tool.
 
 ## Support
 
