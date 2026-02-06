@@ -75,12 +75,34 @@ def generate_launch_description():
         output='screen'
     )
 
+    # ── Pose persistence saved in sqlite
+    db_path = launch.substitutions.LaunchConfiguration('db_path', default='~/.warebot/pose_history.db')
+    save_interval = launch.substitutions.LaunchConfiguration('save_interval', default='2.0')
+    map_frame = launch.substitutions.LaunchConfiguration('map_frame', default='map')
+    robot_frame = launch.substitutions.LaunchConfiguration('robot_frame', default='base_link')
+    publish_initial_pose = launch.substitutions.LaunchConfiguration('publish_initial_pose', default='True')
+
+    pose_persistence_node = launch_ros.actions.Node(
+        name='pose_persistence_node',
+        package='vizanti_server',
+        executable='pose_persistence.py',
+        output='screen',
+        parameters=[
+            {'db_path': db_path},
+            {'save_interval': save_interval},
+            {'map_frame': map_frame},
+            {'robot_frame': robot_frame},
+            {'publish_initial_pose': publish_initial_pose},
+        ]
+    )
+
     return launch.LaunchDescription([
         rosbridge_node,
         rosapi_node,
         flask_node,
         tf_handler_node,
-        service_handler_node
+        service_handler_node,
+        pose_persistence_node
     ])
 
 if __name__ == '__main__':

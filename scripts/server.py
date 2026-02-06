@@ -4,9 +4,10 @@ import os
 import threading
 import logging
 import json
+import sqlite3
 import rclpy
 
-from flask import Flask, render_template, send_from_directory, make_response
+from flask import Flask, render_template, send_from_directory, make_response, request, jsonify
 from waitress.server import create_server
 
 from std_msgs.msg import String
@@ -119,6 +120,57 @@ def list_ros_launch_params():
 def serve_static(path):
 	return send_from_directory(app.static_folder, path)
 
+# ── Pose persistence REST API ──────────────────────────────────────
+
+def _pose_db_path():
+	return os.path.expanduser('~/.warebot/pose_history.db')
+
+def api_get_last_pose():
+	"""GET /api/pose/last – return the most recently saved pose."""
+	db = _pose_db_path()
+	if not os.path.exists(db):
+		return jsonify(success=False, message='No pose database found'), 404
+	try:
+		conn = sqlite3.connect(db)
+		row = conn.execute(
+			'SELECT timestamp, frame_id, x, y, z, qx, qy, qz, qw '
+			'FROM pose_history ORDER BY timestamp DESC LIMIT 1'
+		).fetchone()
+		conn.close()
+		if row is None:
+			return jsonify(success=False, message='No poses saved yet'), 404
+		return jsonify(
+			success=True,
+			pose=dict(timestamp=row[0], frame_id=row[1],
+					  x=row[2], y=row[3], z=row[4],
+					  qx=row[5], qy=row[6], qz=row[7], qw=row[8])
+		)
+	except Exception as e:
+		return jsonify(success=False, message=str(e)), 500
+
+def api_get_pose_history():
+	"""GET /api/pose/history?limit=100 – return recent pose entries."""
+	db = _pose_db_path()
+	if not os.path.exists(db):
+		return jsonify(success=False, message='No pose database found'), 404
+	limit = request.args.get('limit', 100, type=int)
+	try:
+		conn = sqlite3.connect(db)
+		rows = conn.execute(
+			'SELECT timestamp, frame_id, x, y, z, qx, qy, qz, qw '
+			'FROM pose_history ORDER BY timestamp DESC LIMIT ?', (limit,)
+		).fetchall()
+		conn.close()
+		poses = [
+			dict(timestamp=r[0], frame_id=r[1],
+				 x=r[2], y=r[3], z=r[4],
+				 qx=r[5], qy=r[6], qz=r[7], qw=r[8])
+			for r in rows
+		]
+		return jsonify(success=True, poses=poses, count=len(poses))
+	except Exception as e:
+		return jsonify(success=False, message=str(e)), 500
+
 class ServerThread(threading.Thread):
 	def __init__(self, app, host='0.0.0.0', port=5000):
 		threading.Thread.__init__(self)
@@ -188,6 +240,8 @@ def main(args=None):
 	app.add_url_rule(param_base_url + '/assets/robot_model/paths', 'list_robot_model_files', list_robot_model_files)
 	app.add_url_rule(param_base_url + '/ros_launch_params', 'ros_launch_params', list_ros_launch_params)
 	app.add_url_rule(param_base_url + '/default_widget_config', 'get_default_widget_config', get_default_widget_config)
+	app.add_url_rule(param_base_url + '/api/pose/last', 'api_get_last_pose', api_get_last_pose)
+	app.add_url_rule(param_base_url + '/api/pose/history', 'api_get_pose_history', api_get_pose_history)
 	app.add_url_rule(param_base_url + '/<path:path>', 'serve_static', serve_static)
 
 	server = ServerThread(app, param_host, param_port)

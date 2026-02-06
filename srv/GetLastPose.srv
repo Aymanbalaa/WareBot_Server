@@ -1,0 +1,6 @@
+# Request: empty, just fetch the last saved pose
+---
+# Response
+geometry_msgs/PoseStamped pose
+bool success
+string message

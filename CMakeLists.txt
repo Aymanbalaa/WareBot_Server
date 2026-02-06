@@ -34,6 +34,7 @@ set(srv_files
   "srv/ListPackages.srv"
   "srv/ListExecutables.srv"
   "srv/ListLifecycles.srv"
+  "srv/GetLastPose.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -61,6 +62,7 @@ install(PROGRAMS
   scripts/server.py
   scripts/service_handler.py
   scripts/rqt_reconfigure_param_api.py
+  scripts/pose_persistence.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
