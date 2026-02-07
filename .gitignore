@@ -1,4 +1,49 @@
+# Byte-compiled / cache
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 
-.vscode/*
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build artifacts
+build/
+install/
+log/
+logs/
+
+# CMake/CTest
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+CTestConfiguration.ini
+
+# Colcon / ROS build artifacts
+_colcon_
+colcon-*
+
+# Python packaging
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Misc
+.DS_Store
+.cache/
+.venv/
+venv/
+env/
+ENV/
