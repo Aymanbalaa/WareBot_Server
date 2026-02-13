@@ -101,27 +101,13 @@ def generate_launch_description():
     publish_initial_pose = launch.substitutions.LaunchConfiguration(
         "publish_initial_pose", default="True"
     )
-
-    pose_persistence_node = launch_ros.actions.Node(
-        name="pose_persistence_node",
-        package="vizanti_server",
-        executable="pose_persistence.py",
-        output="screen",
-        parameters=[
-            {"db_path": db_path},
-            {"save_interval": save_interval},
-            {"map_frame": map_frame},
-            {"robot_frame": robot_frame},
-            {"publish_initial_pose": publish_initial_pose},
-        ],
-    )
+    # Pose persistence moved to VPS; Pi no longer saves to local DB.
 
     return launch.LaunchDescription([
         rosbridge_node,
         rosapi_node,
         tf_handler_node,
         service_handler_node,
-        pose_persistence_node,
     ])
 
 
