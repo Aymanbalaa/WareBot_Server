@@ -1,0 +1,129 @@
+"""
+Pi-side ROS2 launch file
+=========================
+Launches only the ROS2 components that MUST run on the Pi:
+  - rosbridge_websocket  (WebSocket bridge for browser ↔ ROS2)
+  - rosapi               (topic/service introspection for roslib.js)
+  - tf_consolidator      (batches TF into single throttled topic)
+  - service_handler      (node mgmt, map, rosbag, reconfigure)
+  - pose_persistence     (TF → SQLite, publishes /initialpose on boot)
+
+The Flask web server runs on the VPS, NOT here.
+"""
+
+import launch
+import launch_ros.actions
+
+
+def generate_launch_description():
+
+    # ── rosbridge params ──────────────────────────────────────────────
+    port_rosbridge = launch.substitutions.LaunchConfiguration(
+        "port_rosbridge", default="6701"
+    )
+    websocket_ping_interval = launch.substitutions.LaunchConfiguration(
+        "websocket_ping_interval", default="4"
+    )
+    websocket_ping_timeout = launch.substitutions.LaunchConfiguration(
+        "websocket_ping_timeout", default="15"
+    )
+    unregister_timeout = launch.substitutions.LaunchConfiguration(
+        "unregister_timeout", default="9999999.9"
+    )
+    retry_startup_delay = launch.substitutions.LaunchConfiguration(
+        "retry_startup_delay", default="10.0"
+    )
+    fragment_timeout = launch.substitutions.LaunchConfiguration(
+        "fragment_timeout", default="30"
+    )
+    delay_between_messages = launch.substitutions.LaunchConfiguration(
+        "delay_between_messages", default="0.0"
+    )
+    max_message_size = launch.substitutions.LaunchConfiguration(
+        "max_message_size", default="999999999"
+    )
+
+    rosbridge_node = launch_ros.actions.Node(
+        name="vizanti_rosbridge",
+        package="rosbridge_server",
+        executable="rosbridge_websocket",
+        output="screen",
+        parameters=[
+            {"authenticate": False},
+            {"port": port_rosbridge},
+            {"address": "0.0.0.0"},
+            {"retry_startup_delay": retry_startup_delay},
+            {"fragment_timeout": fragment_timeout},
+            {"delay_between_messages": delay_between_messages},
+            {"max_message_size": max_message_size},
+            {"unregister_timeout": unregister_timeout},
+            {"use_compression": True},
+            {"websocket_ping_interval": websocket_ping_interval},
+            {"websocket_ping_timeout": websocket_ping_timeout},
+        ],
+    )
+
+    rosapi_node = launch_ros.actions.Node(
+        name="rosapi",
+        package="rosapi",
+        executable="rosapi_node",
+    )
+
+    # ── TF consolidator (C++) ─────────────────────────────────────────
+    tf_handler_node = launch_ros.actions.Node(
+        name="vizanti_tf_handler_node",
+        package="vizanti_server",
+        executable="tf_consolidator",
+        output="screen",
+    )
+
+    # ── Service handler ───────────────────────────────────────────────
+    service_handler_node = launch_ros.actions.Node(
+        name="vizanti_service_handler_node",
+        package="vizanti_server",
+        executable="service_handler.py",
+        output="screen",
+    )
+
+    # ── Pose persistence ──────────────────────────────────────────────
+    db_path = launch.substitutions.LaunchConfiguration(
+        "db_path", default="~/.warebot/pose_history.db"
+    )
+    save_interval = launch.substitutions.LaunchConfiguration(
+        "save_interval", default="2.0"
+    )
+    map_frame = launch.substitutions.LaunchConfiguration(
+        "map_frame", default="map"
+    )
+    robot_frame = launch.substitutions.LaunchConfiguration(
+        "robot_frame", default="base_link"
+    )
+    publish_initial_pose = launch.substitutions.LaunchConfiguration(
+        "publish_initial_pose", default="True"
+    )
+
+    pose_persistence_node = launch_ros.actions.Node(
+        name="pose_persistence_node",
+        package="vizanti_server",
+        executable="pose_persistence.py",
+        output="screen",
+        parameters=[
+            {"db_path": db_path},
+            {"save_interval": save_interval},
+            {"map_frame": map_frame},
+            {"robot_frame": robot_frame},
+            {"publish_initial_pose": publish_initial_pose},
+        ],
+    )
+
+    return launch.LaunchDescription([
+        rosbridge_node,
+        rosapi_node,
+        tf_handler_node,
+        service_handler_node,
+        pose_persistence_node,
+    ])
+
+
+if __name__ == "__main__":
+    launch.main()

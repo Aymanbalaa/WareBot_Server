@@ -1,0 +1,50 @@
+# WareBot VPS Quick-Start Guide
+# =============================
+
+## Step 1: Clone the repo (if not already there)
+cd /tmp
+git clone https://github.com/Aymanbalaa/WareBot_Server.git warebot
+cd warebot
+
+## Step 2: Run the automated setup
+sudo bash ./vps/setup_vps.sh
+
+# This will:
+#   ✓ Install Python, nginx, wireguard, certbot
+#   ✓ Create /opt/warebot/ directory
+#   ✓ Set up Python venv with Flask + Waitress
+#   ✓ Create systemd unit for the web server
+#   ✓ Generate WireGuard keys
+#   ✓ Install nginx config
+
+## Step 3: Configure the nginx file
+# Edit the config to point to the Pi's WireGuard IP
+sudo nano /etc/nginx/sites-available/warebot
+
+# Find this line:
+#   upstream rosbridge_backend {
+#       server PI_WG_IP:6701;
+#   }
+# 
+# Replace PI_WG_IP with 10.0.0.2 (the Pi's WireGuard IP)
+# Save (Ctrl+X, Y, Enter)
+
+## Step 4: Reload nginx
+sudo systemctl reload nginx
+
+## Step 5: Check the Flask server is running
+sudo systemctl status warebot-web
+
+## Step 6: Display WireGuard info
+echo "Your VPS public key (send to Pi):"
+grep "PrivateKey" /etc/wireguard/wg0.conf | awk '{print $3}' | wg pubkey
+
+echo ""
+echo "WireGuard config location: /etc/wireguard/wg0.conf"
+
+## Step 7: Test the server
+curl http://localhost:6700
+# Should return HTML
+
+## Step 8: Optionally enable TLS (Let's Encrypt)
+sudo certbot --nginx -d your-domain.com

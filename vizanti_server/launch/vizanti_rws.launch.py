@@ -3,8 +3,8 @@ import launch_ros.actions
 
 def generate_launch_description():
     base_url = launch.substitutions.LaunchConfiguration('base_url', default='') #e.g. /vizanti
-    port = launch.substitutions.LaunchConfiguration('port', default=5000)
-    port_rosbridge = launch.substitutions.LaunchConfiguration('port_rosbridge', default=5001)
+    port = launch.substitutions.LaunchConfiguration('port', default=6700)
+    port_rosbridge = launch.substitutions.LaunchConfiguration('port_rosbridge', default=6701)
     flask_debug = launch.substitutions.LaunchConfiguration('flask_debug', default=True)
     default_widget_config = launch.substitutions.LaunchConfiguration('default_widget_config', default='') #e.g. ~/your_custom_config.json
 

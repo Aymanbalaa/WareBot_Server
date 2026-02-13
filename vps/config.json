@@ -1,0 +1,15 @@
+{
+    "host": "0.0.0.0",
+    "port": 6700,
+    "port_rosbridge": 6701,
+    "base_url": "",
+    "compression": "none",
+    "default_widget_config": "",
+    "flask_debug": false,
+
+    "pi_bridge_url": "http://PI_IP_OR_WIREGUARD:6780",
+    "pose_db_path": "~/.warebot/pose_history.db",
+
+    "_comment_compression": "Use 'cbor' if using rws instead of rosbridge",
+    "_comment_pi_bridge_url": "URL of the Pi's bridge REST API for pose sync and service proxying"
+}

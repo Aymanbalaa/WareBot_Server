@@ -17,8 +17,8 @@ from pathlib import Path
 
 node = None
 param_base_url = ""
-param_port = 5000
-param_port_rosbridge = 5001
+param_port = 6700
+param_port_rosbridge = 6701
 param_compression = "none"
 param_default_widget_config = ""
 
@@ -172,7 +172,7 @@ def api_get_pose_history():
 		return jsonify(success=False, message=str(e)), 500
 
 class ServerThread(threading.Thread):
-	def __init__(self, app, host='0.0.0.0', port=5000):
+	def __init__(self, app, host='0.0.0.0', port=6700):
 		threading.Thread.__init__(self)
 		self.daemon = True
 
